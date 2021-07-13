@@ -35,11 +35,10 @@ DELIMITER $$
 
 CREATE PROCEDURE sp_RetrieveUserProducts(IN Id INT)
 BEGIN
-SELECT UserProductId, UserId, ProductId, Quantity FROM UserProducts WHERE UserId=Id;
+SELECT up.UserProductId, up.ProductId, up.UserId, up.Quantity, u.Name as `UserName`, p.Name as `ProductName` FROM UserProducts up INNER JOIN Users u ON up.UserId=u.UserId INNER JOIN Products p ON p.ProductId=up.ProductId WHERE UserId=Id;
 END$$
 DELIMITER ;
 
 # CALL sp_RetrieveUserProducts(1);
 
-SELECT up.UserProductId, up.ProductId, up.UserId, up.Quantity, u.Name as `UserName`, p.Name as `ProductName` FROM UserProducts up INNER JOIN Users u ON up.UserId=u.UserId INNER JOIN Products p ON p.ProductId=up.ProductId
 
