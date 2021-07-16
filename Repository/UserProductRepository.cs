@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Contracts;
@@ -19,20 +20,22 @@ namespace Repository
             _db = db;
             _logger = logger;
         }
+
         public async Task<IEnumerable<UserProductDto>> FindAll()
         {
             List<UserProductDto> result = new List<UserProductDto>();
             // using var connection = new MySqlConnection(yourConnectionString);
             await _db.OpenAsync();
 
-            using var command = new MySqlCommand("SELECT up.UserProductId, up.ProductId, up.UserId, up.Quantity, u.Name as `UserName`, p.Name as `ProductName` FROM UserProducts up INNER JOIN Users u ON up.UserId=u.UserId INNER JOIN Products p ON p.ProductId=up.ProductId;", _db);
+
+            using var command = new MySqlCommand("sp_RetrieveAllUserProducts", _db);
+            command.CommandType = CommandType.StoredProcedure;
             using var reader = await command.ExecuteReaderAsync();
             while (await reader.ReadAsync())
             {
                 UserProductDto entity = GetModel(reader);
                 result.Add(entity);
             }
-
             await _db.CloseAsync();
             return result;
         }
@@ -67,7 +70,7 @@ namespace Repository
             List<UserProductDto> result = new List<UserProductDto>();
             // using var connection = new MySqlConnection(yourConnectionString);
             await _db.OpenAsync();
-
+        
             using var command = new MySqlCommand($"SELECT up.UserProductId, up.ProductId, up.UserId, up.Quantity, u.Name as `UserName`, p.Name as `ProductName` FROM UserProducts up INNER JOIN Users u ON up.UserId=u.UserId INNER JOIN Products p ON p.ProductId=up.ProductId WHERE up.UserId={userId};", _db);
             using var reader = await command.ExecuteReaderAsync();
             while (await reader.ReadAsync())
