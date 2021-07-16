@@ -1,8 +1,10 @@
 using System.Collections.Generic;
 using System.Data;
-using SimpleWebApi.Models;
+using Entities.Models;
 using System.Data.SqlClient;
+using System.Linq;
 using System.Threading.Tasks;
+using Contracts;
 using Microsoft.Extensions.Configuration;
 using MySqlConnector;
 
@@ -11,29 +13,19 @@ namespace SimpleWebApi.Processors
     public class ProductProcessor
     {
         private readonly MySqlConnection _db;
+        private readonly IProductRepository _productRepository;
         
-        public ProductProcessor(MySqlConnection db)
+        public ProductProcessor(MySqlConnection db, IProductRepository productRepository)
         {
             _db = db;
+            _productRepository = productRepository;
         }
 
         
-        public async Task<List<User>> GetAllUsers()
+        public async Task<List<Product>> GetAllProducts()
         {
-            List<User> result = new List<User>();
-            // using var connection = new MySqlConnection(yourConnectionString);
-            await _db.OpenAsync();
-
-            using var command = new MySqlCommand("SELECT * FROM Users;", _db);
-            using var reader = await command.ExecuteReaderAsync();
-            while (await reader.ReadAsync())
-            {
-                User entity= new User();
-                entity.UserId = (int)reader["UserId"];
-                entity.Name= (string)reader["Name"];
-                result.Add(entity);
-            }
-            return result;
+            var products = await _productRepository.FindAll();
+            return products.ToList();
         }
     }
 }

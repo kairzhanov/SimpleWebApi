@@ -1,63 +1,36 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
+using Contracts;
 using MySqlConnector;
-using SimpleWebApi.Models;
+using Entities.Models;
 
 namespace SimpleWebApi.Processors
 {
     public class UserProductProcessor
     {
         private readonly MySqlConnection _db;
+        private readonly IUserProductRepository _userProductRepository;
         
-        public UserProductProcessor(MySqlConnection db)
+        public UserProductProcessor(MySqlConnection db, IUserProductRepository userProductRepository)
         {
             _db = db;
+            _userProductRepository = userProductRepository;
         }
 
         public async Task<List<UserProductDto>> GetAllUserProductsAsync()
         {
-            List<UserProductDto> result = new List<UserProductDto>();
-            // using var connection = new MySqlConnection(yourConnectionString);
-            await _db.OpenAsync();
+            var userProducts = await _userProductRepository.FindAll();
 
-            using var command = new MySqlCommand("SELECT up.UserProductId, up.ProductId, up.UserId, up.Quantity, u.Name as `UserName`, p.Name as `ProductName` FROM UserProducts up INNER JOIN Users u ON up.UserId=u.UserId INNER JOIN Products p ON p.ProductId=up.ProductId;", _db);
-            using var reader = await command.ExecuteReaderAsync();
-            while (await reader.ReadAsync())
-            {
-                UserProductDto entity = GetModel(reader);
-                result.Add(entity);
-            }
-            return result;
+            return userProducts.ToList();
         }
         
         public async Task<List<UserProductDto>> GetUserProductsAsync(int userId)
         {
-            List<UserProductDto> result = new List<UserProductDto>();
-            // using var connection = new MySqlConnection(yourConnectionString);
-            await _db.OpenAsync();
-
-            using var command = new MySqlCommand($"SELECT up.UserProductId, up.ProductId, up.UserId, up.Quantity, u.Name as `UserName`, p.Name as `ProductName` FROM UserProducts up INNER JOIN Users u ON up.UserId=u.UserId INNER JOIN Products p ON p.ProductId=up.ProductId WHERE up.UserId={userId};", _db);
-            using var reader = await command.ExecuteReaderAsync();
-            while (await reader.ReadAsync())
-            {
-                UserProductDto entity = GetModel(reader);
-                result.Add(entity);
-            }
-            return result;
+            var userProducts = await _userProductRepository.GetUserProductsAsync(userId);
+            return userProducts.ToList();
         }
 
-        private UserProductDto GetModel(MySqlDataReader reader)
-        {
-            UserProductDto entity= new UserProductDto();
-            entity.UserId = (int) reader["UserId"];
-            // entity.Name= (string)reader["Name"];
-            entity.ProductId = (int) reader["ProductId"];
-            entity.UserProductId = (int) reader["UserProductId"];
-            entity.Quantity = (int) reader["Quantity"];
-            entity.UserName = (string) reader["UserName"];
-            entity.ProductName = (string) reader["ProductName"];
-
-            return entity;
-        }
+        
     }
 }

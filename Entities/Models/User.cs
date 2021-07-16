@@ -1,4 +1,4 @@
-namespace SimpleWebApi.Models
+namespace Entities.Models
 {
     public class User
     {

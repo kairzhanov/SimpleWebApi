@@ -1,7 +1,7 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using SimpleWebApi.Models;
+using Entities.Models;
 using SimpleWebApi.Processors;
 
 namespace SimpleWebApi.Controllers
