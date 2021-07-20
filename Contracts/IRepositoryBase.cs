@@ -11,7 +11,7 @@ namespace Contracts
         Task<IEnumerable<T>> FindAll();
         Task<IEnumerable<T>> FindByConditionAsync(Expression<Func<T, bool>> expression);
         Task<T> FindById(int id);
-        Task<int>CreateAsync(T entity);
+        Task<int> CreateAsync(T entity);
         Task<int> UpdateAsync(T entity);
         Task<int> DeleteAsync(T entity);
     }

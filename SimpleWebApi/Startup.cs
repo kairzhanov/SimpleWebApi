@@ -50,7 +50,10 @@ namespace SimpleWebApi
                 app.UseDeveloperExceptionPage();
             }
             app.UseCors(
-                options => options.WithOrigins(Configuration["FrontEndDomain"]).AllowAnyMethod()
+                options => options.WithOrigins(Configuration["FrontEndDomain"])
+                .AllowAnyMethod()
+                .AllowAnyHeader()
+                .AllowCredentials()
             );
             app.UseHttpsRedirection();
 

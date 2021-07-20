@@ -34,21 +34,27 @@ namespace SimpleWebApi.Processors
             return user;
         }
 
-        private User GetModel(MySqlDataReader reader)
+        public async Task<User> CreateUser(User user)
         {
-            try
-            {
-                User entity= new User();
-                entity.UserId = (int)reader["UserId"];
-                entity.Name= (string)reader["Name"];
-                return entity;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex.Message);
-                return null;
-            }
+            var newUserId = await _userRepository.CreateAsync(user);
+            user.UserId = newUserId;
+            return user;
         }
-        
+
+        public async Task<int> UpdateUser(User user)
+        {
+            var result = await _userRepository.UpdateAsync(user);
+            return result;
+        }
+
+        public async Task<int> DeleteUser(int userId)
+        {
+            var user = await _userRepository.FindById(userId);
+            if (user == null)
+                return -1;
+
+            var result = await _userRepository.DeleteAsync(user);
+            return result;
+        }
      }
 }
