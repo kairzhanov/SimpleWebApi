@@ -32,7 +32,8 @@ namespace Repository
             if (_db.State == ConnectionState.Closed)
                 await _db.OpenAsync();
 
-            using var command = new MySqlCommand(@"SELECT * FROM Users;", _db);
+            using var command = new MySqlCommand("sp_GetAllUsers", _db);
+            command.CommandType = CommandType.StoredProcedure;
             using var reader = await command.ExecuteReaderAsync();
             while (await reader.ReadAsync())
             {
